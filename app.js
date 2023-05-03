@@ -52,9 +52,22 @@ app.get("/", function (req, res) {
   const items = Item.find({}).exec();
   items
     .then((items) => {
-      console.log(items); // This will log an array of documents
-      const day = date.getDate();
-      res.render("list", { listTitle: day, newListItems: items });
+      if (items.length === 0) {
+        Item.insertMany(defaultItems).then(function (err) {
+          if (err) {
+            
+            console.log("Error here");
+            console.log(err);
+          } else {
+            console.log("Successfuly added 3 items!");
+            res.redirect("/")
+          }
+        });
+      } else {
+        console.log(items); // This will log an array of documents
+        const day = date.getDate();
+        res.render("list", { listTitle: day, newListItems: items });
+      }
     })
     .catch((err) => {
       console.error(err); // Handle any errors that occur
@@ -62,13 +75,15 @@ app.get("/", function (req, res) {
 });
 
 app.post("/", function (req, res) {
-  const newItem = req.body.newItem;
+  const text = req.body.newItem;
+  const newItem = new Item({
+    task: text
+  })
+
+  newItem.save()
   if (req.body.list === "Work") {
-    workItems.push(newItem);
     res.redirect("/work");
   } else {
-    /* items.push(newItem); */
-
     res.redirect("/");
   }
 });
