@@ -1,19 +1,21 @@
 <%- include("header") -%>
     <div class="box" id="heading">
-        <h1>It's a <%= listTitle %></h1>
+        <h1><%= listTitle %></h1>
     </div>
 
     <div class="box">
        
 <% newListItems.forEach(item => { %>
-    <div class="item">
-        <input type="checkbox">
-        <p><%= item.task %></p>
-    </div>
+    <form method="post" action="/delete">
+        <div class="item">
+          <input type="checkbox" onchange="this.form.submit()" name="checkbox"  value="<%=item._id %>"/>
+          <p><%= item.task %></p>
+        </div>
+      </form>
 <% }) %>
         <form method="post" action="/" class="item">
             <input type="text" name="newItem" placeholder="New Task" autocomplete="off">
-            <button type="submit" name="list" value=<%= listTitle%>>+</button>
+            <button type="submit" name="list" value=<%= listTitle%> >+</button>
         </form>
     </div>
 
