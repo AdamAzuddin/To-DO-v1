@@ -113,23 +113,41 @@ app.post("/", function (req, res) {
   if (listName == "Today") {
     newItem.save();
     res.redirect("/");
-  } else{
-    List.findOne({name:listName}).then(function (list){
-      list.items.push(newItem)
-      list.save()
-      res.redirect(`/${listName}`)
-    }).catch((err)=>{
-      console.log(err);
-    })
+  } else {
+    List.findOne({ name: listName })
+      .then(function (list) {
+        list.items.push(newItem);
+        list.save();
+        res.redirect(`/${listName}`);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 });
 
 app.post("/delete", function (req, res) {
   const checkedItem = req.body.checkbox;
-  Item.findByIdAndRemove(checkedItem).then(function (err) {
-    console.log(`Deleted  ${checkedItem}`);
-    res.redirect("/");
-  });
+  const listName = req.body.listName;
+
+  if (listName === "Today") {
+    Item.findByIdAndRemove(checkedItem).then(function (err) {
+      console.log(`Deleted  ${checkedItem}`);
+      res.redirect("/");
+    });
+  } else {
+    List.findOneAndUpdate(
+      { name: listName },
+      { $pull: { items: { _id: checkedItem } } }
+    )
+      .then(function (list) {
+        list.save();
+        res.redirect(`/${listName}`);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 });
 
 app.get("/about", function (req, res) {
