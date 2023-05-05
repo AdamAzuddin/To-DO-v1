@@ -5,9 +5,21 @@ const bodyParser = require("body-parser");
 const date = require(__dirname + "/date.js");
 const mongoose = require("mongoose");
 const app = express();
+const PORT = process.env.PORT || 3000
+
+mongoose.set('strictQuery', false);
+const connectDB = async ()=>{
+  try{
+    const conn = await 
+    mongoose.connect(process.env.MONGO_URL);
+    console.log(`MongoDB connected at ${conn.connection.host}`);
+  } catch (err){
+    console.log(err);
+    process.exit(1)
+  }
+}
 
 // connect to mongodb database
-mongoose.connect("mongodb+srv://adam:X5xyg7d4HfeXwPUS@cluster0.c4zjtrz.mongodb.net/todoDB");
 
 // item schema
 
@@ -154,6 +166,9 @@ app.get("/about", function (req, res) {
   res.render("about");
 });
 
-app.listen(3000, function () {
-  console.log("Server started on port 3000");
-});
+/* */
+connectDB().then(()=>{
+  app.listen(PORT, function () {
+    console.log("Server started on port"+PORT);
+  }); 
+})
